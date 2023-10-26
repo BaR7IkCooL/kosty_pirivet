@@ -1,0 +1,102 @@
+from tkinter import *
+from tkinter import ttk
+from tkinter import messagebox as mb
+
+i = 1
+summ = 0
+a = 1
+cl = 0
+val = 0
+#обьявление переменных
+
+c = Tk()
+c.title('количество ингридиентов')
+en = Entry()
+nn = Label(text='сколько ингридиентов?')
+nn.grid(row=1, column=2)
+en.grid(row=2, column=2)
+#первое диалоговое окно
+
+def check() : #проверка значения при нажатии кнопки, числовое или нет
+    global val
+    val = str (en.get())
+    if not val.isdigit():
+        mb.showerror('ошибка', 'введите число')
+    else: #если числовое то создаёт новое окно LLst и
+        c.destroy() #удаляет старое и сохраняет количество ингридиентов как переменную val
+        
+        LLst = Tk() #шапка нового окна
+        LLst.title('данные')
+        ff = Label(LLst, text='название')
+        fg = Label(LLst, text='стоимость')
+        fh = Label(LLst, text='наименование')
+        ff.grid(row=0, column=1)
+        fg.grid(row=0, column=2)
+        fh.grid(row=0, column=3)
+        name = ['ml', 'gr']
+        
+
+        N = []
+        S = []
+        Na = []
+        #обьявление массивов с основной информацией
+        
+        def create(st) : #функция которая создаёт строки для заполнения
+            n = Entry(LLst)
+            s = Entry(LLst)
+            na = ttk.Combobox(LLst, values=name)
+            n.grid(row = st , column=1)
+            s.grid(row=st, column=2)
+            na.grid(row=st, column=3)
+            def check_l() : #и при нажатии на кнопку проверяет их заполнение
+                if str (n.get()) != '' and str (s.get()) != '' and str (na.get()) != '' :
+                    #если заполнено то сохраняет в массивы под сствецтвующим индексом
+                    N.append(str (n.get()))
+                    S.append(s.get())
+                    Na.append(str (na.get()))
+                    if str (len(Na)) < val :
+                        #если количество ингридиентов val не совпадает с индексом последнего значения,
+                        #то создаёт новые строки и снова их проверяет при нажатии на кнопку
+                        global i
+                        i += 1
+                        create(i)
+                    else: #если совпадает переходит к новому окну inp
+                        LLst.destroy()
+                        inp = Tk()
+                        inp.title('количкство ингридиентов')
+                        def create_2(vr) : #функция создающяя строки запраивающие количество ингридиентов в блюде
+                            global cl
+                            nnn =  Label(inp, text=N[vr])
+                            cl = Entry(inp)
+                            nna = Label(inp, text=Na[vr])
+                            nnn.grid(row=vr, column=0)
+                            cl.grid(row=vr, column=1)
+                            nna.grid(row=vr, column=2)
+                        def clc_02() : #при нажфтии на ok считает стоимость уже введённых ингридиентов и 
+                            global a
+                            global val
+                            if a < int (val) : #если введены не все добавляет строку
+                                global summ
+                                global cl
+                                summ += int (cl.get()) * int (S[a-1])
+                                print (summ)
+                                create_2(a)
+                                a += 1
+                            elif a == int (val) : #если введены все показывает стоимость
+                                summ += int (cl.get()) * int (S[a-1])
+                                print (summ)
+                                a += 1
+                                suu = Label(inp, text='стоимость' + str (summ)+'р')
+                                suu.grid(row=(a+1), column=0)
+                                
+                        ook = ttk.Button(inp, text='ok', command=clc_02)
+                        ook.grid(row=0, column=4)
+                        create_2(0)
+                        inp.mainloop()
+            ko = Button(LLst, text='ok', command=check_l)
+            ko.grid(row=1, column=4)
+            LLst.mainloop()
+        create(i)
+ok = Button(text='ok', command=check)
+ok.grid(row=3, column=2)
+c.mainloop()
